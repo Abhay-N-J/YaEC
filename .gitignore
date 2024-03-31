@@ -1,0 +1,9 @@
+/backend/FastBackend
+/backend/__pycache__
+
+/frontend/StreamlitFrontend
+
+/order-management/__pycache__
+/product-management/__pycache__
+/user-management/__pycache__
+/review-management/__pycache__

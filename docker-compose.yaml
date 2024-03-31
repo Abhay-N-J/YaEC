@@ -1,0 +1,65 @@
+version: "3.8"
+
+services:
+
+  user-management:
+    build: 
+        context: ./user-management
+        dockerfile: Dockerfile
+    image: cc-backend:1.0
+    ports:
+    - "8000:8000"
+    volumes:
+    - ./user-management:/code
+
+  product-management:
+    build: 
+        context: ./product-management
+        dockerfile: Dockerfile
+    image: cc-backend:1.0
+    ports:
+    - "8001:8000"
+    volumes:
+    - ./product-management:/code
+
+  order-management:
+    build: 
+        context: ./order-management
+        dockerfile: Dockerfile
+    image: cc-backend:1.0
+    ports:
+    - "8002:8000"
+    volumes:
+    - ./order-management:/code
+  
+  review-management:
+    build: 
+        context: ./review-management
+        dockerfile: Dockerfile
+    image: cc-backend:1.0
+    ports:
+    - "8003:8000"
+    volumes:
+    - ./review-management:/code
+
+  frontend:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: cc-frontend:1.0
+    ports:
+    - "8080:8080"
+    volumes:
+    - ./frontend:/code
+    depends_on:
+      - user-management
+      - product-management
+      - order-management
+      - review-management
+
+
+    
+
+networks: 
+  my_network:
+    driver: bridge
