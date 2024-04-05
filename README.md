@@ -5,7 +5,7 @@ Start the services
 
 `docker-compose up -d`
 
-View the frontend
+View frontend
 
 `http://localhost:8080/`
 
