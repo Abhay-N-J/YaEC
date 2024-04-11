@@ -7,3 +7,6 @@
 /product-management/__pycache__
 /user-management/__pycache__
 /review-management/__pycache__
+
+.env
+.test.sh
