@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 
-services=["project_product-management_1","project_order-management_1","project_user-management_1","project_review-management_1"]
+services=["yaec-product-management-1","yaec-order-management-1","yaec-user-management-1","yaec-review-management-1"]
 
 def fetch_data(service):
     response = requests.get(f"http://{service}:8000/")

@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
 
   user-management:
@@ -56,8 +54,6 @@ services:
       - product-management
       - order-management
       - review-management
-
-
     
 
 networks: 
