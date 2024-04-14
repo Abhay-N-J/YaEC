@@ -31,17 +31,15 @@ class UserProfileUpdate(BaseModel):
     email: str
     # Add more fields as required for the user profile update
 
-# MongoDB connection
-async def connect_to_mongo():
-    client = AsyncIOMotorClient(MONGO_URL)
-    db = client[DB_NAME]
-    return db
+@app.on_event("startup")
+async def startup_db_client():
+    app.mongodb_client = AsyncIOMotorClient(MONGO_URL)
+    app.mongodb = app.mongodb_client[DB_NAME]
 
-# Dependency to get database connection
-async def get_db():
-    db = await connect_to_mongo()
-    yield db
-    db.client.close()
+@app.on_event("shutdown")
+async def shutdown_db_client():
+    app.mongodb_client.close()
+
 
 # Function to hash password
 def hash_password(password: str):
@@ -54,7 +52,9 @@ def verify_password(plain_password, hashed_password):
 # Function to register a new user
 async def register_user(user: UserRegister, db):
     user.passwd = hash_password(user.passwd)
-    result = await db[USER_COLLECTION].insert_one(user.dict())
+    user_doc = user.dict()
+    user_doc["is_admin"] = False
+    result = await db[USER_COLLECTION].insert_one(user_doc)
 
 # Function to authenticate user
 async def authenticate_user(user: UserLogin, db) -> bool:
@@ -77,7 +77,8 @@ async def user_exists(user: UserRegister, db) -> bool:
 
 # Register route for user registration
 @app.post("/register/", status_code=status.HTTP_201_CREATED)
-async def register_new_user(user: UserRegister, res: Response, db = Depends(get_db)):
+async def register_new_user(user: UserRegister, res: Response):
+    db = app.mongodb
     if await user_exists(user, db) == False:
         return {"message": "Username or email already taken"}
     await register_user(user, db)
@@ -85,17 +86,28 @@ async def register_new_user(user: UserRegister, res: Response, db = Depends(get_
 
 # Login route for user authentication
 @app.post("/login/", status_code=status.HTTP_202_ACCEPTED)
-async def login_user(user: UserLogin, res: Response, db = Depends(get_db)):
+async def login_user(user: UserLogin, res: Response):
+    db = app.mongodb
     authenticated = await authenticate_user(user, db)
     if not authenticated:
         res.status_code = status.HTTP_401_UNAUTHORIZED
         return {"message": "Invalid credentials"}
     return {"message": "Login successful"}
 
+@app.post("/check_admin/", status_code=status.HTTP_202_ACCEPTED)
+async def check_admin(user: UserLogin, res: Response):
+    db = app.mongodb
+    authenticated = await authenticate_user(user, db)
+    if not authenticated or await db[USER_COLLECTION].count_documents({"$and": [{"user": user.user}, {"is_admin": True}]}) == 0:
+        res.status_code = status.HTTP_401_UNAUTHORIZED
+        return {"message": "Invalid credentials"}
+    return {"message": "Login successful"}
+
 # Route for updating user profile 
-# TODO #INCOMPLETE #ERRONEOUS
+# TODO #INCOMPLETE #ERRONEOUSS
 @app.put("/profile/{user_id}/",status_code=status.HTTP_200_OK)
-async def update_profile(user_id: str, profile_update: UserProfileUpdate, res: Response, db = Depends(get_db)):
+async def update_profile(user_id: str, profile_update: UserProfileUpdate, res: Response):
+    db = app.mongodb
     updated = await update_user_profile(user_id, profile_update, db)
     if not updated:
         res.status_code = status.HTTP_404_NOT_FOUND
