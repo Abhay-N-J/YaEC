@@ -14,7 +14,6 @@ security = HTTPBasic()
 load_dotenv()
 MONGO_URL = os.getenv("MONGO_URI")
 DB_NAME = "YaEC"
-USER_COLLECTION = "Users"
 PRODUCTS_COLLECTION = "Products"
  
 class Product(BaseModel):
@@ -46,17 +45,18 @@ async def shutdown_db_client():
     app.mongodb_client.close()
 
 async def authenticate_user(credentials: HTTPBasicCredentials = Depends(security)):
-    client = AsyncIOMotorClient(MONGO_URL)
-    users_collection = client[DB_NAME][USER_COLLECTION]
-    user = await users_collection.find_one({"user": credentials.username})
-    if user:
-        user["passwd"] = credentials.password
+    user = {
+        "user": credentials.username,
+        "passwd": credentials.password
+    }
+    response = requests.post("http://yaec-user-management-1:8000/login/", json=user)
+    res = response.json()
+    if res["message"] == "Login successful":
         return user
     else:
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
-async def check_admin(user: dict = Depends(authenticate_user)):
-    del user["_id"]
+async def check_admin(user: dict = Depends(authenticate_user)):     
     response = requests.post("http://yaec-user-management-1:8000/check_admin/", json=user)
     res = response.json()
     if res["message"] == "Login successful":
