@@ -17,6 +17,7 @@ load_dotenv()
 MONGO_URL = os.getenv("MONGO_URI")
 DB_NAME = "YaEC"
 USER_COLLECTION = "Users"
+VALIDITY = 10
 
 
 # Password hashing settings
@@ -84,22 +85,36 @@ async def update_user_profile(user_id: str, profile_update: UserProfileUpdate, d
     return result.modified_count > 0
 
 async def user_exists(user: UserRegister, db) -> bool:
-    return await db[USER_COLLECTION].count_documents({"user": user.user}) == 0
+    return await db[USER_COLLECTION].count_documents({"$or": [{"user": user.user}, {"email": user.email}]}) == 0
 
 def create_token(user: str):
     token =  str(uuid4()) + user + str(datetime.now())
     passTokens[user] = Token.parse_obj({"token": token, "creation": datetime.now()})
     
-def authenticate_token(user: UserLogin):
-     if passTokens.get(user.user):
+async def authenticate_token(user: UserLogin, login: bool):
+    db = app.mongodb
+    is_authenticated = await authenticate_user(user, db)
+    if passTokens.get(user.user):
         token = passTokens[user.user]
-        is_valid_token = token.creation + timedelta(hours=10) > datetime.now()
+        is_valid_token = token.creation + timedelta(hours=VALIDITY) > datetime.now()
         is_correct_token = token.token == user.passwd
+        
         if is_correct_token and is_valid_token:
             return {"message": "Login successful"}
-        if is_valid_token:
-            raise HTTPException(status_code=401, detail="Invalid Credentials")
-        return None
+        elif is_valid_token and is_authenticated:
+            return {"token": passTokens[user.user].token}
+        elif not is_valid_token and is_correct_token:
+            del passTokens[user.user]
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Regenerate token")
+        elif not is_correct_token and not is_authenticated:
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Credentials")
+
+    if is_authenticated and login:
+        create_token(user.user)
+        return {"token": passTokens[user.user].token}
+
+    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Credentials")
+        
     
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
@@ -120,28 +135,19 @@ async def register_new_user(user: UserRegister, res: Response):
 # Login route for user authentication
 @app.post("/login/", status_code=status.HTTP_202_ACCEPTED)
 async def login_user(user: UserLogin, res: Response):
-    res = authenticate_token(user)
-    if res is not None:
-        return res
-    db = app.mongodb
-    authenticated = await authenticate_user(user, db)
-    if not authenticated:
-        raise HTTPException(status_code=401, detail="Invalid Credentials")
-    create_token(user.user)
-    return {"token": passTokens[user.user].token}
+    res = await authenticate_token(user, True)
+    return res
 
 @app.post("/check_admin/", status_code=status.HTTP_202_ACCEPTED)
 async def check_admin(user: UserLogin, res: Response):
     db = app.mongodb
-    res = authenticate_token(user)
-    print(passTokens)
+    res = await authenticate_token(user, False)
     admin_count = await db[USER_COLLECTION].count_documents({"$and": [{"user": user.user}, {"is_admin": True}]})
-    if res is not None and admin_count > 0:
-        return res
-    elif res:
+    if admin_count > 0:
+        return {"message": "Login successful"}
+    else:
         raise HTTPException(status_code=401, detail="Not Admin")
-    return await login_user(user, res)
-
+        
 # Route for updating user profile 
 # TODO #INCOMPLETE #ERRONEOUSS
 @app.put("/profile/{user_id}/",status_code=status.HTTP_200_OK)

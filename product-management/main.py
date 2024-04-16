@@ -67,9 +67,6 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 async def create_product(product: Product, res: Response, is_admin = Depends(check_admin)):
     if is_admin.get("error"):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=is_admin["error"])
-    elif is_admin.get("token"):
-        res.status_code = status.HTTP_202_ACCEPTED
-        return {"token": is_admin["token"]}
     product_doc = product.dict()
     await app.mongodb.insert_one(product_doc)
     return {"message": "Product created"}
@@ -86,10 +83,6 @@ async def get_product(product_name: str):
 async def update_product(product_name: str, product: Product, is_admin = Depends(check_admin)):
     if is_admin.get("error"):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=is_admin["error"])
-    elif is_admin.get("token"):
-        print({"token": is_admin["token"]})
-        res.status_code = status.HTTP_202_ACCEPTED
-        return {"token": is_admin["token"]}
     if await app.mongodb.find_one({"name": product_name}):
         await app.mongodb.update_one({"name": product_name}, {"$set": product.dict()})
         return {"message": "Product updated successfully"}
@@ -100,10 +93,6 @@ async def update_product(product_name: str, product: Product, is_admin = Depends
 async def delete_product(product_name: str, is_admin = Depends(check_admin)):
     if is_admin.get("error"):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=is_admin["error"])
-    elif is_admin.get("token"):
-        print({"token": is_admin["token"]})
-        res.status_code = status.HTTP_202_ACCEPTED
-        return {"token": is_admin["token"]}
     if await app.mongodb.find_one({"name": product_name}):
         await app.mongodb.delete_one({"name": product_name})
         return {"message": "Product deleted successfully"}
