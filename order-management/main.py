@@ -1,5 +1,6 @@
-from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi import FastAPI, HTTPException, Depends, status, Response, Request
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi.responses import JSONResponse
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
 from bson import ObjectId
@@ -45,29 +46,34 @@ async def authenticate_user(credentials: HTTPBasicCredentials = Depends(security
     }
     response = requests.post("http://yaec-user-management-1:8000/login/", json=user)
     res = response.json()
-    if res["message"] == "Login successful":
-        return user
-    else:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+    return res
 
-# async def check_admin(user: dict = Depends(authenticate_user)):     
-#     response = requests.post("http://yaec-user-management-1:8000/check_admin/", json=user)
-#     res = response.json()
-#     if res["message"] == "Login successful":
-#         return True
-#     else:
-#         raise HTTPException(status_code=403, detail="User is not an admin")
-
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"error": exc.detail}
+    )
 
 @app.post("/orders/")
-async def create_order(order: Order):
+async def create_order(order: Order, res: Response, is_user = Depends(authenticate_user)):
+    if is_user.get("error"):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=is_user["error"])
+    elif is_user.get("token"):
+        res.status_code = status.HTTP_202_ACCEPTED
+        return {"token": is_user["token"]}
     order.order_id += order.user_id
     order_doc = order.dict()
     result = await app.mongodb.insert_one(order_doc)
-    return {"id": str(result.inserted_id)}
+    return {"message": "Created Order"}
 
 @app.get("/orders/{order_id}/")
-async def read_order(order_id: str):
+async def read_order(order_id: str, res: Response, is_user = Depends(authenticate_user)):
+    if is_user.get("error"):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=is_user["error"])
+    elif is_user.get("token"):
+        res.status_code = status.HTTP_202_ACCEPTED
+        return {"token": is_user["token"]}
     order = await app.mongodb.find_one({"order_id": order_id})
     if order:
         del order["_id"]
@@ -75,16 +81,26 @@ async def read_order(order_id: str):
     raise HTTPException(status_code=404, detail="Order not found")
 
 @app.put("/orders/{order_id}/")
-async def update_order(order_id: str, order: Order):
-    order.order_id += order.user_id
-    order = await app.mongodb.find_one({"order_id": order_id})
-    if order:
+async def update_order(order_id: str, order: Order,  res: Response, is_user = Depends(authenticate_user)):
+    if is_user.get("error"):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=is_user["error"])
+    elif is_user.get("token"):
+        res.status_code = status.HTTP_202_ACCEPTED
+        return {"token": is_user["token"]}
+    o = await app.mongodb.find_one({"order_id": order_id})
+    if o:
+        order.order_id = o["order_id"]
         await app.mongodb.update_one({"order_id": order_id}, {"$set": order.dict()})
         return {"message": "Order updated successfully"}
     raise HTTPException(status_code=404, detail="Order not found")
     
 @app.delete("/orders/{order_id}/")
-async def delete_order(order_id: str):
+async def delete_order(order_id: str, res: Response, is_user = Depends(authenticate_user)):
+    if is_user.get("error"):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=is_user["error"])
+    elif is_user.get("token"):
+        res.status_code = status.HTTP_202_ACCEPTED
+        return {"token": is_user["token"]}
     order = await app.mongodb.find_one({"order_id": order_id})
     if order:
         await app.mongodb.delete_one({"order_id": order_id})
@@ -92,7 +108,12 @@ async def delete_order(order_id: str):
     raise HTTPException(status_code=404, detail="Order not found")
     
 @app.get("/orders/")
-async def list_orders():
+async def list_orders(res: Response, is_user = Depends(authenticate_user)):
+    if is_user.get("error"):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=is_user["error"])
+    elif is_user.get("token"):
+        res.status_code = status.HTTP_202_ACCEPTED
+        return {"token": is_user["token"]}
     orders = []
     cursor = app.mongodb.find()
     async for order in cursor:

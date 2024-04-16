@@ -40,13 +40,13 @@ async def create_review(review: Review):
     result = await app.mongodb.insert_one(review_doc)
     return {"id": str(result.inserted_id)}
 
-@app.get("/reviews/{user_name}/{product_name}/")
+@app.get("/reviews/{product_name}/")
 async def read_review(user_name: str, product_name: str):
-    review = await app.mongodb.find_one({"user_name": user_name, "product_name": product_name})
-    if review:
+    cursor = await app.mongodb.find({"product_name": product_name})
+    async for review in cursor:
         del review["_id"]
-        return review
-    raise HTTPException(status_code=404, detail="Review not found")
+        reviews.append(review)
+    return reviews
 
 @app.put("/reviews/{user_name}/{product_name}/")
 async def update_review(user_name: str, product_name: str, review: Review):

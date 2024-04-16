@@ -153,6 +153,13 @@ async def update_profile(user_id: str, profile_update: UserProfileUpdate, res: R
         return {"message": "User not found"}
     return {"message": "Profile updated successfully"}
 
+@app.delete("/del_cache/{user}/", status_code=status.HTTP_200_OK)
+async def debug_del_cache(user: str):
+    if passTokens.get(user):
+        del passTokens[user]
+        return {"ok": "1"}
+    return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Key not found")
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -1,5 +1,6 @@
-from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi import FastAPI, HTTPException, Depends, status, Response, Request
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi.responses import JSONResponse
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
 from bson import ObjectId
@@ -44,28 +45,31 @@ async def startup_db_client():
 async def shutdown_db_client():
     app.mongodb_client.close()
 
-async def authenticate_user(credentials: HTTPBasicCredentials = Depends(security)):
+
+async def check_admin(credentials: HTTPBasicCredentials = Depends(security)):
     user = {
-        "user": credentials.username,
+        "user": credentials.username, 
         "passwd": credentials.password
     }
-    response = requests.post("http://yaec-user-management-1:8000/login/", json=user)
-    res = response.json()
-    if res["message"] == "Login successful":
-        return user
-    else:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
-
-async def check_admin(user: dict = Depends(authenticate_user)):     
     response = requests.post("http://yaec-user-management-1:8000/check_admin/", json=user)
     res = response.json()
-    if res["message"] == "Login successful":
-        return True
-    else:
-        raise HTTPException(status_code=403, detail="User is not an admin")
+    return res
+    
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"error": exc.detail}
+    )
 
-@app.post("/products/", dependencies=[Depends(check_admin)], status_code=status.HTTP_201_CREATED)
-async def create_product(product: Product):
+
+@app.post("/products/", status_code=status.HTTP_201_CREATED)
+async def create_product(product: Product, res: Response, is_admin = Depends(check_admin)):
+    if is_admin.get("error"):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=is_admin["error"])
+    elif is_admin.get("token"):
+        res.status_code = status.HTTP_202_ACCEPTED
+        return {"token": is_admin["token"]}
     product_doc = product.dict()
     await app.mongodb.insert_one(product_doc)
     return {"message": "Product created"}
@@ -78,8 +82,14 @@ async def get_product(product_name: str):
         return product
     raise HTTPException(status_code=404, detail="Product not found")
 
-@app.put("/products/{product_name}/", dependencies=[Depends(check_admin)], status_code=status.HTTP_200_OK)
-async def update_product(product_name: str, product: Product):
+@app.put("/products/{product_name}/", status_code=status.HTTP_200_OK)
+async def update_product(product_name: str, product: Product, is_admin = Depends(check_admin)):
+    if is_admin.get("error"):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=is_admin["error"])
+    elif is_admin.get("token"):
+        print({"token": is_admin["token"]})
+        res.status_code = status.HTTP_202_ACCEPTED
+        return {"token": is_admin["token"]}
     if await app.mongodb.find_one({"name": product_name}):
         await app.mongodb.update_one({"name": product_name}, {"$set": product.dict()})
         return {"message": "Product updated successfully"}
@@ -87,7 +97,13 @@ async def update_product(product_name: str, product: Product):
         raise HTTPException(status_code=404, detail="Product does not exist")
     
 @app.delete("/products/{product_name}/", dependencies=[Depends(check_admin)], status_code=status.HTTP_200_OK)
-async def delete_product(product_name: str):
+async def delete_product(product_name: str, is_admin = Depends(check_admin)):
+    if is_admin.get("error"):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=is_admin["error"])
+    elif is_admin.get("token"):
+        print({"token": is_admin["token"]})
+        res.status_code = status.HTTP_202_ACCEPTED
+        return {"token": is_admin["token"]}
     if await app.mongodb.find_one({"name": product_name}):
         await app.mongodb.delete_one({"name": product_name})
         return {"message": "Product deleted successfully"}
@@ -96,7 +112,7 @@ async def delete_product(product_name: str):
     
 @app.get("/products/", status_code=status.HTTP_200_OK)
 async def list_products(skip: int = 0, limit: int = 10):
-    products = []
+    products = [ ]
     cursor = app.mongodb.find().skip(skip).limit(limit)
     async for product in cursor:
         del product["_id"]
