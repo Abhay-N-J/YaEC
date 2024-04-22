@@ -37,11 +37,21 @@ pipeline {
         stage('Push') {
             steps {
                 script {
-                    sh "docker push akshar0909/cc-backend-user:1.0"
-                    sh "docker push akshar0909/cc-backend-product:1.0"
-                    sh "docker push akshar0909/cc-backend-order:1.0"
-                    sh "docker push akshar0909/cc-backend-review:1.0"
-                    sh "docker push akshar0909/cc-frontend:1.0"
+                    docker.withRegistry('https://registry.hub.docker.com','docker-registry-credentials') {
+                        sh "docker push akshar0909/cc-backend-user:1.0"
+                    }
+                    docker.withRegistry('https://registry.hub.docker.com','docker-registry-credentials') {
+                        sh "docker push akshar0909/cc-backend-product:1.0"
+                    }
+                    docker.withRegistry('https://registry.hub.docker.com','docker-registry-credentials') {
+                        sh "docker push akshar0909/cc-backend-order:1.0"
+                    }
+                    docker.withRegistry('https://registry.hub.docker.com','docker-registry-credentials') {
+                        sh "docker push akshar0909/cc-backend-review:1.0"
+                    }
+                    docker.withRegistry('https://registry.hub.docker.com','docker-registry-credentials') {
+                        sh "docker push akshar0909/cc-frontend:1.0"
+                    }
                 }
             }
         }
