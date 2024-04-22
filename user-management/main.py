@@ -20,6 +20,7 @@ USER_COLLECTION = "Users"
 VALIDITY = 10
 
 
+
 # Password hashing settings
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -45,6 +46,8 @@ class UserProfileUpdate(BaseModel):
 
 @app.on_event("startup")
 async def startup_db_client():
+    print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+    print("MONGO_URL:", MONGO_URL)
     app.mongodb_client = AsyncIOMotorClient(MONGO_URL)
     app.mongodb = app.mongodb_client[DB_NAME]
 
@@ -101,7 +104,7 @@ async def authenticate_token(user: UserLogin, login: bool):
         
         if is_correct_token and is_valid_token:
             return {"message": "Login successful"}
-        elif is_valid_token and is_authenticated:
+        elif is_valid_token and is_authenticated: 
             return {"token": passTokens[user.user].token}
         elif not is_valid_token and is_correct_token:
             del passTokens[user.user]

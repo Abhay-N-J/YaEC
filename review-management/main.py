@@ -4,7 +4,6 @@ from pydantic import BaseModel
 from bson import ObjectId
 from dotenv import load_dotenv
 import os
-import requests
 
 app=FastAPI()
 

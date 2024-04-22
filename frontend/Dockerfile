@@ -8,4 +8,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD ["streamlit", "run", "main.py", "--server.port", "8080", "--server.address", "0.0.0.0"]
+EXPOSE 8004
+
+CMD ["streamlit", "run", "main.py", "--server.port", "8004", "--server.address", "0.0.0.0"]

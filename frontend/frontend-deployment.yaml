@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: frontend-deployment
+  template:
+    metadata:
+      labels:
+        app: frontend-deployment
+    spec:
+      containers:
+      - image: akshar0909/cc-frontend:1.0
+        name: frontend-deployment
+        ports:
+        - containerPort: 8004
+        imagePullPolicy: Always
+

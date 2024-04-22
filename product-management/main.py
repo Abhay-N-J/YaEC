@@ -51,7 +51,7 @@ async def check_admin(credentials: HTTPBasicCredentials = Depends(security)):
         "user": credentials.username, 
         "passwd": credentials.password
     }
-    response = requests.post("http://yaec-user-management-1:8000/check_admin/", json=user)
+    response = requests.post("http://user-service:8000/check_admin/", json=user)
     res = response.json()
     return res
     

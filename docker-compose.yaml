@@ -46,7 +46,7 @@ services:
       dockerfile: Dockerfile
     image: cc-frontend:1.0
     ports:
-    - "8080:8080"
+    - "8004:8004"
     volumes:
     - ./frontend:/code
     depends_on:

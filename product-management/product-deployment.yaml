@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-deployment
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: product-deployment
+  template:
+    metadata:
+      labels:
+        app: product-deployment
+    spec:
+      containers:
+      - name: product-deployment
+        image: akshar0909/cc-backend-product:1.0
+        ports:
+        - containerPort: 8001
+        imagePullPolicy: Always
+

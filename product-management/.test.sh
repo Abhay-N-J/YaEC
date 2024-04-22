@@ -12,7 +12,7 @@ curl -X PUT "http://localhost:8001/products/Product%202/" \
     -H "Content-Type: application/json" \
     -u test_admin:adminpassword \
     -d '{"name": "Product 2", "description": "Updated Description", "price": 29.99}'
-
+b
 #Delete Product
 curl -X DELETE "http://localhost:8001/products/Product%202/" \
     -u test_admin:adminpassword

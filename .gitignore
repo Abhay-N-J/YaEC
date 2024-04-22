@@ -3,6 +3,8 @@
 
 /frontend/StreamlitFrontend
 
+/db_data
+
 /order-management/__pycache__
 /product-management/__pycache__
 /user-management/__pycache__
