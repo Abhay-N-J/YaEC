@@ -37,19 +37,11 @@ pipeline {
         stage('Push') {
             steps {
                 script {
-                    docker.withRegistry([ credentialsId: "docker-registry-credentials", url: "" ]) {
+                    docker.withRegistry([ credentialsId: "docker-registry-credentials", url: "https://registry.hub.docker.com" ]) {
                         sh "docker push akshar0909/cc-backend-user:1.0"
-                    }
-                    docker.withRegistry([ credentialsId: "docker-registry-credentials", url: "" ]) {
                         sh "docker push akshar0909/cc-backend-product:1.0"
-                    }
-                    docker.withRegistry([ credentialsId: "docker-registry-credentials", url: "" ]) {
                         sh "docker push akshar0909/cc-backend-order:1.0"
-                    }
-                    docker.withRegistry([ credentialsId: "docker-registry-credentials", url: "" ]) {
                         sh "docker push akshar0909/cc-backend-review:1.0"
-                    }
-                    docker.withRegistry([ credentialsId: "docker-registry-credentials", url: "" ]) {
                         sh "docker push akshar0909/cc-frontend:1.0"
                     }
                 }
