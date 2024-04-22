@@ -34,19 +34,20 @@ pipeline {
             }
         }
 
-        stage('Push') {
-            steps {
-                script {
-                    docker.withRegistry([ credentialsId: "docker-registry-credentials", url: "https://registry.hub.docker.com" ]) {
-                        sh "docker push akshar0909/cc-backend-user:1.0"
-                        sh "docker push akshar0909/cc-backend-product:1.0"
-                        sh "docker push akshar0909/cc-backend-order:1.0"
-                        sh "docker push akshar0909/cc-backend-review:1.0"
-                        sh "docker push akshar0909/cc-frontend:1.0"
-                    }
+        stage('Push image') {
+            withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
+                def registry_url = "registry.hub.docker.com/"
+                sh "docker login -u $USER -p $PASSWORD ${registry_url}"
+                docker.withRegistry("http://${registry_url}", "docker-hub-credentials") {
+                    sh "docker push akshar0909/cc-backend-user:1.0"
+                    sh "docker push akshar0909/cc-backend-product:1.0"
+                    sh "docker push akshar0909/cc-backend-order:1.0"
+                    sh "docker push akshar0909/cc-backend-review:1.0"
+                    sh "docker push akshar0909/cc-frontend:1.0"
                 }
             }
         }
+
 
         stage('Deploy') {
             steps {
