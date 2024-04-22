@@ -78,7 +78,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    withCredentials([string(credentialsId: 'kubernetes-credential', variable: 'KUBECONFIG_CONTENT')]) {
+                    withCredentials([string(credentialsId: 'kubernetes-credentials', variable: 'KUBECONFIG_CONTENT')]) {
                         writeFile file: '/tmp/kubeconfig', text: "${KUBECONFIG_CONTENT}"
                         sh """
                         export KUBECONFIG=/tmp/kubeconfig
