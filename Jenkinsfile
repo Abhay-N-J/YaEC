@@ -78,8 +78,8 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    sh "kubectl apply -f ./mongodb/db-deployment.yaml"
                     sh "kubectl apply -f ./user-management/user-deployment.yaml"
+                    sh "kubectl apply -f ./mongodb/db-deployment.yaml"
                     sh "kubectl apply -f ./product-management/product-deployment.yaml"
                     sh "kubectl apply -f ./order-management/order-deployment.yaml"
                     sh "kubectl apply -f ./review-management/review-deployment.yaml"
