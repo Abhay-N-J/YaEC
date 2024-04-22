@@ -78,9 +78,10 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    withCredentials([file(credentialsId: 'kubernetes-credentials', variable: 'KUBECONFIG_PATH')]) {
+                    withCredentials([string(credentialsId: 'kubeconfig-credential', variable: 'KUBECONFIG_CONTENT')]) {
+                        writeFile file: '/tmp/kubeconfig', text: "${KUBECONFIG_CONTENT}"
                         sh """
-                        export KUBECONFIG=${KUBECONFIG_PATH}
+                        export KUBECONFIG=/tmp/kubeconfig
                         kubectl apply -f ./user-management/user-deployment.yaml
                         kubectl apply -f ./mongodb/db-deployment.yaml
                         kubectl apply -f ./product-management/product-deployment.yaml
