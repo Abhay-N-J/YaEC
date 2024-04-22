@@ -82,19 +82,19 @@ pipeline {
                         sh """
                         echo ${KUBECONFIG_FILE}
                         export KUBECONFIG=${KUBECONFIG_FILE}
-                        kubectl apply -f ./user-management/user-deployment.yaml
-                        kubectl apply -f ./mongodb/db-deployment.yaml
-                        kubectl apply -f ./product-management/product-deployment.yaml
-                        kubectl apply -f ./order-management/order-deployment.yaml
-                        kubectl apply -f ./review-management/review-deployment.yaml
-                        kubectl apply -f ./frontend/frontend-deployment.yaml
-
-                        kubectl apply -f ./mongodb/db-service.yaml
-                        kubectl apply -f ./user-management/user-service.yaml
-                        kubectl apply -f ./product-management/product-service.yaml
-                        kubectl apply -f ./order-management/order-service.yaml
-                        kubectl apply -f ./review-management/review-service.yaml
-                        kubectl apply -f ./frontend/frontend-service.yaml
+                        sudo kubectl apply -f ./user-management/user-deployment.yaml
+                        sudo kubectl apply -f ./mongodb/db-deployment.yaml
+                        sudo kubectl apply -f ./product-management/product-deployment.yaml
+                        sudo kubectl apply -f ./order-management/order-deployment.yaml
+                        sudo kubectl apply -f ./review-management/review-deployment.yaml
+                        sudo kubectl apply -f ./frontend/frontend-deployment.yaml
+ 
+                        sudo kubectl apply -f ./mongodb/db-service.yaml
+                        sudo kubectl apply -f ./user-management/user-service.yaml
+                        sudo kubectl apply -f ./product-management/product-service.yaml
+                        sudo kubectl apply -f ./order-management/order-service.yaml
+                        sudo kubectl apply -f ./review-management/review-service.yaml
+                        sudo kubectl apply -f ./frontend/frontend-service.yaml
                         """
                     }
                 }
