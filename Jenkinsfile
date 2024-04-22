@@ -80,6 +80,7 @@ pipeline {
                 script {
                     withCredentials([file(credentialsId: 'kubernetes-credentials', variable: 'KUBECONFIG_FILE')]) {
                         sh """
+                        minikube start
                         kubectl apply -f ./user-management/user-deployment.yaml --kubeconfig=${KUBECONFIG_FILE}
                         kubectl apply -f ./mongodb/db-deployment.yaml --kubeconfig=${KUBECONFIG_FILE}
                         kubectl apply -f ./product-management/product-deployment.yaml --kubeconfig=${KUBECONFIG_FILE}
