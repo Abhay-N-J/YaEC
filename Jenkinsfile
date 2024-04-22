@@ -78,24 +78,20 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    withCredentials([file(credentialsId: 'kubernetes-credentials', variable: 'KUBECONFIG_FILE')]) {
-                        sh """
-                        minikube start
-                        kubectl apply -f ./user-management/user-deployment.yaml --kubeconfig=${KUBECONFIG_FILE}
-                        kubectl apply -f ./mongodb/db-deployment.yaml --kubeconfig=${KUBECONFIG_FILE}
-                        kubectl apply -f ./product-management/product-deployment.yaml --kubeconfig=${KUBECONFIG_FILE}
-                        kubectl apply -f ./order-management/order-deployment.yaml --kubeconfig=${KUBECONFIG_FILE}
-                        kubectl apply -f ./review-management/review-deployment.yaml --kubeconfig=${KUBECONFIG_FILE}
-                        kubectl apply -f ./frontend/frontend-deployment.yaml --kubeconfig=${KUBECONFIG_FILE}
-
-                        kubectl apply -f ./mongodb/db-service.yaml --kubeconfig=${KUBECONFIG_FILE}
-                        kubectl apply -f ./user-management/user-service.yaml --kubeconfig=${KUBECONFIG_FILE}
-                        kubectl apply -f ./product-management/product-service.yaml --kubeconfig=${KUBECONFIG_FILE}
-                        kubectl apply -f ./order-management/order-service.yaml --kubeconfig=${KUBECONFIG_FILE}
-                        kubectl apply -f ./review-management/review-service.yaml --kubeconfig=${KUBECONFIG_FILE}
-                        kubectl apply -f ./frontend/frontend-service.yaml --kubeconfig=${KUBECONFIG_FILE}
-                        """
-                    }
+                    sh """
+                    kubectl apply -f ./mongodb/db-deployment.yaml s
+                    kubectl apply -f ./user-management/user-deployment.yaml
+                    kubectl apply -f ./product-management/product-deployment.yaml 
+                    kubectl apply -f ./order-management/order-deployment.yaml 
+                    kubectl apply -f ./review-management/review-deployment.yaml
+                    kubectl apply -f ./frontend/frontend-deployment.yaml
+                    kubectl apply -f ./mongodb/db-service.yaml 
+                    kubectl apply -f ./user-management/user-service.yaml
+                    kubectl apply -f ./product-management/product-service.yaml
+                    kubectl apply -f ./order-management/order-service.yaml 
+                    kubectl apply -f ./review-management/review-service.yaml 
+                    kubectl apply -f ./frontend/frontend-service.yaml 
+                    """
                 }
             }
         }
