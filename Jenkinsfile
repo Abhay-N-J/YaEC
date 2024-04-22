@@ -80,6 +80,7 @@ pipeline {
                 script {
                     withCredentials([file(credentialsId: 'kubernetes-credentials', variable: 'KUBECONFIG_FILE')]) {
                         sh """
+                        echo ${KUBECONFIG_FILE}
                         export KUBECONFIG=${KUBECONFIG_FILE}
                         kubectl apply -f ./user-management/user-deployment.yaml
                         kubectl apply -f ./mongodb/db-deployment.yaml
