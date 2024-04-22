@@ -80,21 +80,19 @@ pipeline {
                 script {
                     withCredentials([file(credentialsId: 'kubernetes-credentials', variable: 'KUBECONFIG_FILE')]) {
                         sh """
-                        echo ${KUBECONFIG_FILE}
-                        export KUBECONFIG=${KUBECONFIG_FILE}
-                        sudo kubectl apply -f ./user-management/user-deployment.yaml
-                        sudo kubectl apply -f ./mongodb/db-deployment.yaml
-                        sudo kubectl apply -f ./product-management/product-deployment.yaml
-                        sudo kubectl apply -f ./order-management/order-deployment.yaml
-                        sudo kubectl apply -f ./review-management/review-deployment.yaml
-                        sudo kubectl apply -f ./frontend/frontend-deployment.yaml
- 
-                        sudo kubectl apply -f ./mongodb/db-service.yaml
-                        sudo kubectl apply -f ./user-management/user-service.yaml
-                        sudo kubectl apply -f ./product-management/product-service.yaml
-                        sudo kubectl apply -f ./order-management/order-service.yaml
-                        sudo kubectl apply -f ./review-management/review-service.yaml
-                        sudo kubectl apply -f ./frontend/frontend-service.yaml
+                        kubectl apply -f ./user-management/user-deployment.yaml --kubeconfig=${KUBECONFIG_FILE}
+                        kubectl apply -f ./mongodb/db-deployment.yaml --kubeconfig=${KUBECONFIG_FILE}
+                        kubectl apply -f ./product-management/product-deployment.yaml --kubeconfig=${KUBECONFIG_FILE}
+                        kubectl apply -f ./order-management/order-deployment.yaml --kubeconfig=${KUBECONFIG_FILE}
+                        kubectl apply -f ./review-management/review-deployment.yaml --kubeconfig=${KUBECONFIG_FILE}
+                        kubectl apply -f ./frontend/frontend-deployment.yaml --kubeconfig=${KUBECONFIG_FILE}
+
+                        kubectl apply -f ./mongodb/db-service.yaml --kubeconfig=${KUBECONFIG_FILE}
+                        kubectl apply -f ./user-management/user-service.yaml --kubeconfig=${KUBECONFIG_FILE}
+                        kubectl apply -f ./product-management/product-service.yaml --kubeconfig=${KUBECONFIG_FILE}
+                        kubectl apply -f ./order-management/order-service.yaml --kubeconfig=${KUBECONFIG_FILE}
+                        kubectl apply -f ./review-management/review-service.yaml --kubeconfig=${KUBECONFIG_FILE}
+                        kubectl apply -f ./frontend/frontend-service.yaml --kubeconfig=${KUBECONFIG_FILE}
                         """
                     }
                 }
