@@ -79,19 +79,22 @@ pipeline {
             steps {
                 script {
                     withCredentials([file(credentialsId: 'kubernetes-credentials', variable: 'KUBECONFIG_PATH')]) {
-                        sh "kubectl --kubeconfig=${KUBECONFIG_PATH} apply -f ./user-management/user-deployment.yaml"
-                        sh "kubectl --kubeconfig=${KUBECONFIG_PATH} apply -f ./mongodb/db-deployment.yaml"
-                        sh "kubectl --kubeconfig=${KUBECONFIG_PATH} apply -f ./product-management/product-deployment.yaml"
-                        sh "kubectl --kubeconfig=${KUBECONFIG_PATH} apply -f ./order-management/order-deployment.yaml"
-                        sh "kubectl --kubeconfig=${KUBECONFIG_PATH} apply -f ./review-management/review-deployment.yaml"
-                        sh "kubectl --kubeconfig=${KUBECONFIG_PATH} apply -f ./frontend/frontend-deployment.yaml"
+                        sh """
+                        export KUBECONFIG=${KUBECONFIG_PATH}
+                        kubectl apply -f ./user-management/user-deployment.yaml
+                        kubectl apply -f ./mongodb/db-deployment.yaml
+                        kubectl apply -f ./product-management/product-deployment.yaml
+                        kubectl apply -f ./order-management/order-deployment.yaml
+                        kubectl apply -f ./review-management/review-deployment.yaml
+                        kubectl apply -f ./frontend/frontend-deployment.yaml
 
-                        sh "kubectl --kubeconfig=${KUBECONFIG_PATH} apply -f ./mongodb/db-service.yaml"
-                        sh "kubectl --kubeconfig=${KUBECONFIG_PATH} apply -f ./user-management/user-service.yaml"
-                        sh "kubectl --kubeconfig=${KUBECONFIG_PATH} apply -f ./product-management/product-service.yaml"
-                        sh "kubectl --kubeconfig=${KUBECONFIG_PATH} apply -f ./order-management/order-service.yaml"
-                        sh "kubectl --kubeconfig=${KUBECONFIG_PATH} apply -f ./review-management/review-service.yaml"
-                        sh "kubectl --kubeconfig=${KUBECONFIG_PATH} apply -f ./frontend/frontend-service.yaml"
+                        kubectl apply -f ./mongodb/db-service.yaml
+                        kubectl apply -f ./user-management/user-service.yaml
+                        kubectl apply -f ./product-management/product-service.yaml
+                        kubectl apply -f ./order-management/order-service.yaml
+                        kubectl apply -f ./review-management/review-service.yaml
+                        kubectl apply -f ./frontend/frontend-service.yaml
+                        """
                     }
                 }
             }
