@@ -44,6 +44,7 @@ async def authenticate_user(credentials: HTTPBasicCredentials = Depends(security
         "user": credentials.username,
         "passwd": credentials.password
     }
+    print(user)
     response = requests.post("http://user-service:8000/login/", json=user)
     res = response.json()
     return res
