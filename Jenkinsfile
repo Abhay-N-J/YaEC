@@ -79,7 +79,7 @@ pipeline {
             steps {
                 script {
                     sh """
-                    kubectl apply -f ./mongodb/db-deployment.yaml s
+                    kubectl apply -f ./mongodb/db-deployment.yaml 
                     kubectl apply -f ./user-management/user-deployment.yaml
                     kubectl apply -f ./product-management/product-deployment.yaml 
                     kubectl apply -f ./order-management/order-deployment.yaml 
