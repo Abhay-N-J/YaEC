@@ -21,17 +21,17 @@ pipeline {
                     sh """
                     kubectl version --kubeconfig $KUBECONFIG
                     kubectl apply -f ./mongodb/db-deployment.yaml --context minikube --kubeconfig $KUBECONFIG
-                    // kubectl apply -f ./user-management/user-deployment.yaml --context minikube --kubeconfig $KUBECONFIG
-                    // kubectl apply -f ./product-management/product-deployment.yaml --context minikube --kubeconfig $KUBECONFIG
-                    // kubectl apply -f ./order-management/order-deployment.yaml --context minikube --kubeconfig $KUBECONFIG
-                    // kubectl apply -f ./review-management/review-deployment.yaml --context minikube --kubeconfig $KUBECONFIG
-                    // kubectl apply -f ./frontend/frontend-deployment.yaml --context minikube --kubeconfig $KUBECONFIG
-                    // kubectl apply -f ./mongodb/db-service.yaml --context minikube --kubeconfig $KUBECONFIG
-                    // kubectl apply -f ./user-management/user-service.yaml --context minikube --kubeconfig $KUBECONFIG
-                    // kubectl apply -f ./product-management/product-service.yaml --context minikube --kubeconfig $KUBECONFIG
-                    // kubectl apply -f ./order-management/order-service.yaml --context minikube --kubeconfig $KUBECONFIG
-                    // kubectl apply -f ./review-management/review-service.yaml --context minikube --kubeconfig $KUBECONFIG
-                    // kubectl apply -f ./frontend/frontend-service.yaml --context minikube --kubeconfig $KUBECONFIG
+                    kubectl apply -f ./user-management/user-deployment.yaml --context minikube --kubeconfig $KUBECONFIG
+                    kubectl apply -f ./product-management/product-deployment.yaml --context minikube --kubeconfig $KUBECONFIG
+                    kubectl apply -f ./order-management/order-deployment.yaml --context minikube --kubeconfig $KUBECONFIG
+                    kubectl apply -f ./review-management/review-deployment.yaml --context minikube --kubeconfig $KUBECONFIG
+                    kubectl apply -f ./frontend/frontend-deployment.yaml --context minikube --kubeconfig $KUBECONFIG
+                    kubectl apply -f ./mongodb/db-service.yaml --context minikube --kubeconfig $KUBECONFIG
+                    kubectl apply -f ./user-management/user-service.yaml --context minikube --kubeconfig $KUBECONFIG
+                    kubectl apply -f ./product-management/product-service.yaml --context minikube --kubeconfig $KUBECONFIG
+                    kubectl apply -f ./order-management/order-service.yaml --context minikube --kubeconfig $KUBECONFIG
+                    kubectl apply -f ./review-management/review-service.yaml --context minikube --kubeconfig $KUBECONFIG
+                    kubectl apply -f ./frontend/frontend-service.yaml --context minikube --kubeconfig $KUBECONFIG
                     """
                 }
             }
