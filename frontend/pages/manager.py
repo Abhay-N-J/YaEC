@@ -69,7 +69,7 @@ def product_management():
 
     if action == 'Add Product':
         add_product()
-    elif action == 'Edit Product':
+    elif action == 'Update Product':
         edit_product()
     elif action == 'Product User View':
         product_user_view()
@@ -153,16 +153,135 @@ def product_user_view():
     st.title('Product User View')
     st.subheader('## Products')
 
+    # response = requests.get("http://yaec-product-management-1:8001/products/")
     response = requests.get("http://product-service:8001/products/")
     response_json = response.json()
 
     if "error" not in response_json:
         # Create a DataFrame from the products
+        # products_df = pd.DataFrame(response_json)
+        # st.dataframe(products_df)
         products_df = pd.DataFrame(response_json)
-        st.dataframe(products_df)
+        for index, row in products_df.iterrows():
+            # Make each product clickable
+            if st.button(row['name'], key=f"product-{index}"):
+                # Redirect to product details view
+                product_details_view(row)
     else:
         st.error(f'Failed to show all products. Error: {response_json["error"]}')    
     
+def product_details_view(product):
+    st.title(product['name'] + ' Details')
+    # Show product details
+    st.write("Description:", product['description'])
+    st.write("Price:", product['price'])
+
+    # Place order section
+    place_order_section(product)
+
+    # Show your review (if any)
+    your_review_section(product)
+
+    # Show all reviews of this product
+    all_reviews_section(product)
+
+def place_order_section(product):
+    # Your code for place order section here
+    st.subheader("Place Order")
+    quantity = st.number_input("Quantity", min_value=1, value=1)
+    if st.button("Buy", key="place_order_button"):
+        # Call API to place order
+        order_data = {
+            "user_id": st.session_state.user,  # Replace with actual user ID
+            "product_id": product['name'], # Assuming product has an ID
+            "quantity": quantity,
+            "status": "pending"  # Or whatever initial status you want to set
+        }
+        st.success(order_data)
+        # response = requests.post("http://yaec-order-management-1:8002/orders/", json=order_data, auth=(st.session_state.user, st.session_state.token))
+        response = requests.post("http://order-service:8002/orders/", json=order_data, auth=(st.session_state.user, st.session_state.token))
+        if response.status_code == 200:
+            st.success("Order placed successfully!")
+        else:
+            st.error(f"Failed to place order. Error: {response.json()}")
+        
+            
+def your_review_section(product):
+    # Your code for your review section here
+    st.subheader("Your Review")
+    # Call API to get user's review for this product
+    # response = requests.get(f"http://yaec-review-management-1:8003/reviews/{st.session_state.user}/{product['name']}/")
+    response = requests.get(f"http://review-service:8003/reviews/{st.session_state.user}/{product['name']}/")
+    if response.status_code == 200:
+        review_data = response.json()
+        if review_data:
+            st.write("Your Rating:", review_data['rating'])
+            st.write("Your Comment:", review_data['comment'])
+            # Add functionality to update review
+            if st.button("Update Review", key="update_review_button"):
+                new_rating = st.number_input("New Rating", min_value=1, max_value=5, value=review_data['rating'])
+                new_comment = st.text_area("New Comment", value=review_data['comment'])
+                if st.button("Submit Update", key="submit_update_button"):
+                    # Call API to update review
+                    update_data = {
+                        "user_name": st.session_state.user,  # Replace with actual username
+                        "product_name": product['name'],
+                        "rating": new_rating,
+                        "comment": new_comment
+                    }
+                    # response = requests.put(f"http://yaec-review-management-1:8003/reviews/", json=update_data)
+                    response = requests.put(f"http://review-service:8003/reviews/", json=update_data)
+                    if response.status_code == 200:
+                        st.success("Review updated successfully!")
+                    else:
+                        st.error(f"Failed to update review. Error: {response.json()}")
+                pass
+    elif response.status_code == 404:
+        st.write("You haven't reviewed this product yet.")
+        # Add functionality to create review
+        if st.button("Add Review", key="add_review_button"):
+            # Your code to add review
+            rating = st.number_input("Rating", min_value=1, max_value=5)
+            comment = st.text_area("Comment")
+            if st.button("Submit Review", key="submit_review_button"):
+                # Call API to create review
+                review_data = {
+                    "product_name": product['name'],
+                    "user_name": st.session_state.user,  # Replace with actual username
+                    "rating": rating,
+                    "comment": comment
+                }
+                # response = requests.post("http://yaec-review-management-1:8003/reviews/", json=review_data)
+                response = requests.post("http://review-service:8003/reviews/", json=review_data)
+                if response.status_code == 200:
+                    st.success("Review added successfully!")
+                else:
+                    st.error(f"Failed to add review. Error: {response.json()}")
+    else:
+        st.error(f"Failed to fetch your review. Error: {response.json()}")
+
+    pass
+
+def all_reviews_section(product):
+    # Your code for all reviews section here
+    st.subheader("All Reviews")
+    # Call API to get all reviews for this product
+    # response = requests.get(f"http://yaec-review-management-1:8003/reviews/{product['name']}/")
+    response = requests.get(f"http://review-service:8003/reviews/{product['name']}/")
+    if response.status_code == 200:
+        reviews = response.json()["reviews"]
+        if reviews:
+            for review in reviews:
+                st.write(f"User: {review['user_name']}")
+                st.write(f"Rating: {review['rating']}")
+                st.write(f"Comment: {review['comment']}")
+                st.write("---")
+        else:
+            st.write("No reviews available for this product yet.")
+    else:
+        st.error(f"Failed to fetch reviews. Error: {response['error']}")
+
+
 def order_management():
     st.title('Order Management')
     action = st.selectbox('Select Action', ['Order History','Create Order', 'Update Order', 'Delete Order'])
@@ -185,8 +304,7 @@ def order_history():
     response_json = response.json()
     st.success(response_json)
     if "error" not in response_json:
-        filtered_orders_df = pd.DataFrame(response_json)
-        orders_df = filtered_orders_df[filtered_orders_df['user_id'] == st.session_state.user]
+        orders_df = pd.DataFrame(response_json)
         st.dataframe(orders_df)
     else:
         st.error(f'Failed to show all orders. Error: {response_json["error"]}')
@@ -223,8 +341,7 @@ def update_order():
     response = requests.get("http://order-service:8002/orders/",
                             auth=(st.session_state.user, st.session_state.token))
     response_json = response.json()
-    filtered_orders_df = pd.DataFrame(response_json)
-    orders_df = filtered_orders_df[filtered_orders_df['user_id'] == st.session_state.user]
+    orders_df = pd.DataFrame(response_json)
     if orders_df.empty:
         st.error("No orders found for the current user.")
     else:
@@ -258,8 +375,7 @@ def delete_order():
     response = requests.get("http://order-service:8002/orders/",
                             auth=(st.session_state.user, st.session_state.token))
     response_json = response.json()
-    filtered_orders_df = pd.DataFrame(response_json)
-    orders_df = filtered_orders_df[filtered_orders_df['user_id'] == st.session_state.user]
+    orders_df = pd.DataFrame(response_json)
     if orders_df.empty:
         st.error("No orders found for the current user.")
     else:

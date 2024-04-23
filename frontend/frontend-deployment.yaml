@@ -13,7 +13,7 @@ spec:
         app: frontend-deployment
     spec:
       containers:
-      - image: akshar0909/cc-frontend:1.0
+      - image: abhayjo/cc-frontend:1.0
         name: frontend-deployment
         ports:
         - containerPort: 8004

@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: user-deployment
-        image: akshar0909/cc-backend-user:1.0
+        image: abhayjo/cc-backend-user:1.0
         ports:
         - containerPort: 8000
         imagePullPolicy: Always

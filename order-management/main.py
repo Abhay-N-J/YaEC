@@ -47,7 +47,7 @@ async def authenticate_user(credentials: HTTPBasicCredentials = Depends(security
     print(user)
     response = requests.post("http://user-service:8000/login/", json=user)
     res = response.json()
-    return res
+    return res, user
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
@@ -58,6 +58,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 
 @app.post("/orders/")
 async def create_order(order: Order, res: Response, is_user = Depends(authenticate_user)):
+    is_user = is_user[0]
     if is_user.get("error"):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=is_user["error"])
     order.order_id += order.user_id
@@ -67,6 +68,7 @@ async def create_order(order: Order, res: Response, is_user = Depends(authentica
 
 @app.get("/orders/{order_id}/")
 async def read_order(order_id: str, res: Response, is_user = Depends(authenticate_user)):
+    is_user = is_user[0]
     if is_user.get("error"):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=is_user["error"])
     order = await app.mongodb.find_one({"order_id": order_id})
@@ -77,6 +79,7 @@ async def read_order(order_id: str, res: Response, is_user = Depends(authenticat
 
 @app.put("/orders/{order_id}/")
 async def update_order(order_id: str, order: Order,  res: Response, is_user = Depends(authenticate_user)):
+    is_user = is_user[0]
     if is_user.get("error"):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=is_user["error"])
     o = await app.mongodb.find_one({"order_id": order_id})
@@ -88,6 +91,7 @@ async def update_order(order_id: str, order: Order,  res: Response, is_user = De
     
 @app.delete("/orders/{order_id}/")
 async def delete_order(order_id: str, res: Response, is_user = Depends(authenticate_user)):
+    is_user = is_user[0]
     if is_user.get("error"):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=is_user["error"])
     order = await app.mongodb.find_one({"order_id": order_id})
@@ -98,10 +102,10 @@ async def delete_order(order_id: str, res: Response, is_user = Depends(authentic
     
 @app.get("/orders/")
 async def list_orders(res: Response, is_user = Depends(authenticate_user)):
-    if is_user.get("error"):
+    if is_user[0].get("error"):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=is_user["error"])
     orders = []
-    cursor = app.mongodb.find()
+    cursor = app.mongodb.find({"user_id": is_user[1]["user"]})
     async for order in cursor:
         del order["_id"]
         orders.append(order)

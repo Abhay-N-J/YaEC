@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: product-deployment
-        image: akshar0909/cc-backend-product:1.0
+        image: abhayjo/cc-backend-product:1.0
         ports:
         - containerPort: 8001
         imagePullPolicy: Always

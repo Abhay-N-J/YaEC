@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: review-deployment
-        image: akshar0909/cc-backend-review:1.0
+        image: abhayjo/cc-backend-review:1.0
         ports:
         - containerPort: 8003
         imagePullPolicy: Always

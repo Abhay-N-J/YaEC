@@ -17,6 +17,7 @@ load_dotenv()
 MONGO_URL = os.getenv("MONGO_URI")
 DB_NAME = "YaEC"
 USER_COLLECTION = "Users"
+TOKEN_COLLECTION = "Tokens"
 VALIDITY = 10
 
 
@@ -24,10 +25,9 @@ VALIDITY = 10
 # Password hashing settings
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-passTokens = {}
-
 
 class Token(BaseModel):
+    user: str
     token: str
     creation: datetime
 
@@ -46,8 +46,6 @@ class UserProfileUpdate(BaseModel):
 
 @app.on_event("startup")
 async def startup_db_client():
-    print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-    print("MONGO_URL:", MONGO_URL)
     app.mongodb_client = AsyncIOMotorClient(MONGO_URL)
     app.mongodb = app.mongodb_client[DB_NAME]
 
@@ -90,31 +88,34 @@ async def update_user_profile(user_id: str, profile_update: UserProfileUpdate, d
 async def user_exists(user: UserRegister, db) -> bool:
     return await db[USER_COLLECTION].count_documents({"$or": [{"user": user.user}, {"email": user.email}]}) == 0
 
-def create_token(user: str):
-    token =  str(uuid4()) + user + str(datetime.now())
-    passTokens[user] = Token.parse_obj({"token": token, "creation": datetime.now()})
+async def create_token(user: str, db) -> str:
+    token = str(uuid4()) + user + str(datetime.now())
+    await db[TOKEN_COLLECTION].insert_one({"user": user, "token": token, "creation": datetime.now()})
+    return token
+    # passTokens[user] = Token.parse_obj({"token": token, "creation": datetime.now()})
     
 async def authenticate_token(user: UserLogin, login: bool):
     db = app.mongodb
     is_authenticated = await authenticate_user(user, db)
-    if passTokens.get(user.user):
-        token = passTokens[user.user]
-        is_valid_token = token.creation + timedelta(hours=VALIDITY) > datetime.now()
-        is_correct_token = token.token == user.passwd
+    token = await db[TOKEN_COLLECTION].find_one({"user": user.user})
+    print("TOKEN", token)
+    if token:
+        is_valid_token = token["creation"] + timedelta(hours=VALIDITY) > datetime.now()
+        is_correct_token = token["token"] == user.passwd
         
         if is_correct_token and is_valid_token:
             return {"message": "Login successful"}
         elif is_valid_token and is_authenticated: 
-            return {"token": passTokens[user.user].token}
+            return {"token": token["token"]}
         elif not is_valid_token and is_correct_token:
-            del passTokens[user.user]
+            await db[TOKEN_COLLECTION].delete_one({"user": token["user"]})
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Regenerate token")
         elif not is_correct_token and not is_authenticated:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Credentials")
 
     if is_authenticated and login:
-        create_token(user.user)
-        return {"token": passTokens[user.user].token}
+        token = await create_token(user.user, db)
+        return {"token": token}
 
     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Credentials")
         
@@ -126,9 +127,14 @@ async def http_exception_handler(request: Request, exc: HTTPException):
         content={"error": exc.detail}
     )
 
+@app.get("/")
+def user_home():
+    return "Hello from user"
+
 # Register route for user registration
 @app.post("/register/", status_code=status.HTTP_201_CREATED)
 async def register_new_user(user: UserRegister, res: Response):
+    print("hello")
     db = app.mongodb
     if await user_exists(user, db) == False:
         return {"message": "Username or email already taken"}
@@ -164,10 +170,12 @@ async def update_profile(user_id: str, profile_update: UserProfileUpdate, res: R
 
 @app.delete("/del_cache/{user}/", status_code=status.HTTP_200_OK)
 async def debug_del_cache(user: str):
-    if passTokens.get(user):
-        del passTokens[user]
-        return {"ok": "1"}
+    if await app.mongodb[TOKEN_COLLECTION].findOne({"user": user}):
+        await app.mongodb[TOKEN_COLLECTION].deleteOne({"user": user})
+        return {"ok": 1} 
     return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Key not found")
+
+
 
 if __name__ == "__main__":
     import uvicorn

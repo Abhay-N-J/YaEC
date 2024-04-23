@@ -4,7 +4,7 @@ services:
     build: 
         context: ./user-management
         dockerfile: Dockerfile
-    image: cc-backend:1.0
+    image: cc-backend-user:1.0
     ports:
     - "8000:8000"
     volumes:
@@ -14,9 +14,9 @@ services:
     build: 
         context: ./product-management
         dockerfile: Dockerfile
-    image: cc-backend:1.0
+    image: cc-backend-product:1.0
     ports:
-    - "8001:8000"
+    - "8001:8001"
     volumes:
     - ./product-management:/code
 
@@ -24,9 +24,9 @@ services:
     build: 
         context: ./order-management
         dockerfile: Dockerfile
-    image: cc-backend:1.0
+    image: cc-backend-order:1.0
     ports:
-    - "8002:8000"
+    - "8002:8002"
     volumes:
     - ./order-management:/code
   
@@ -34,9 +34,9 @@ services:
     build: 
         context: ./review-management
         dockerfile: Dockerfile
-    image: cc-backend:1.0
+    image: cc-backend-review:1.0
     ports:
-    - "8003:8000"
+    - "8003:8003"
     volumes:
     - ./review-management:/code
 

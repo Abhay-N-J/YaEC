@@ -19,6 +19,7 @@ if st.button('Login'):
 
     # Make the HTTP POST request
     response = requests.post("http://user-service:8000/login/", json=data)
+    # response = requests.post("http://yaec-user-management-1:8000/login/", json=data)
     response_json = response.json()
 
     if "error" in response_json:
