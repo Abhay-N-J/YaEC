@@ -78,6 +78,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh """
+                sh 'kubectl version'
                 kubectl apply -f ./mongodb/db-deployment.yaml
                 kubectl apply -f ./user-management/user-deployment.yaml
                 kubectl apply -f ./product-management/product-deployment.yaml 
