@@ -77,7 +77,7 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                sh "
+                sh """
                 kubectl config use-context minikube
                 kubectl apply -f ./mongodb/db-deployment.yaml
                 kubectl apply -f ./user-management/user-deployment.yaml
