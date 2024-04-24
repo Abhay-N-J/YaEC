@@ -45,6 +45,8 @@ pipeline {
         stage('Push') {
             steps {
                 script {
+                    sh """sudo -u jenkins docker images | awk '$1 != "python" && $1 != "gcr.io/k8s-minikube/kicbase" {print $3}' | xargs -r sudo -u jenkins docker rmi -f """
+
                     dir('user-management') {
                         withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
                             def registry_url = "docker.io"

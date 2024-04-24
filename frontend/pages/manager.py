@@ -156,8 +156,11 @@ def product_user_view():
     # response = requests.get("http://yaec-product-management-1:8001/products/")
     response = requests.get("http://product-service:8001/products/")
     response_json = response.json()
-
-    if "error" not in response_json:
+    
+    if "selected_product" in st.session_state:
+        product_details_view()
+    
+    elif "error" not in response_json:
         # Create a DataFrame from the products
         # products_df = pd.DataFrame(response_json)
         # st.dataframe(products_df)
@@ -165,8 +168,10 @@ def product_user_view():
         for index, row in products_df.iterrows():
             # Make each product clickable
             if st.button(row['name'], key=f"product-{index}"):
-                # Redirect to product details view
-                product_details_view(row)
+                # Store the selected product in session state
+                st.session_state.selected_product = row
+                # Rerun the app to navigate to the product details view
+                st.experimental_rerun()
     else:
         st.error(f'Failed to show all products. Error: {response_json["error"]}')    
     
@@ -184,6 +189,12 @@ def product_details_view(product):
 
     # Show all reviews of this product
     all_reviews_section(product)
+    
+    if st.button("Back"):
+        # Clear the selected product from session state
+        st.session_state.pop("selected_product")
+        # Rerun the app to navigate back to the product user view
+        st.experimental_rerun()
 
 def place_order_section(product):
     # Your code for place order section here
@@ -298,10 +309,8 @@ def order_management():
 def order_history():
     st.header('Order History')
     st.subheader('## Orders')
-    st.success((st.session_state.user, st.session_state.token))
     response = requests.get("http://order-service:8002/orders/",
                             auth=(st.session_state.user, st.session_state.token))
-    response_json = response.json()
     st.success(response_json)
     if "error" not in response_json:
         orders_df = pd.DataFrame(response_json)
@@ -394,9 +403,10 @@ def delete_order():
 def review_management():
     st.title('Review Management')
 
-    response = requests.get("http://product-service:8001/products/")
+    response = requests.get("http://review-service:8003/reviews/")
     response_json = response.json()
-    
+
+    st.write(response_json)
     st.subheader("Reviews:")
     product_names = set(review['product_name'] for review in response_json)
     selected_product = st.selectbox("Select Product:", sorted(product_names))

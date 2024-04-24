@@ -15,7 +15,7 @@ class Review(BaseModel):
     comment: str
 
 # MongoDB connection settings
-load_dotenv()
+print("ENV", load_dotenv())
 MONGO_URL = os.getenv("MONGO_URI")
 DB_NAME = "YaEC"
 REVIEW_COLLECTION = "Reviews"

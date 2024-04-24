@@ -24,7 +24,7 @@ class Order(BaseModel):
     
     
 # MongoDB connection settings
-load_dotenv()
+print("ENV", load_dotenv())
 MONGO_URL = os.getenv("MONGO_URI")
 DB_NAME = "YaEC"
 ORDER_COLLECTION = "Orders"

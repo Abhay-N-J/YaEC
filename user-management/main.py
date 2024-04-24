@@ -13,7 +13,7 @@ import os
 app = FastAPI()
 
 # MongoDB connection settings
-load_dotenv()
+print("ENV", load_dotenv())
 MONGO_URL = os.getenv("MONGO_URI")
 DB_NAME = "YaEC"
 USER_COLLECTION = "Users"
@@ -49,7 +49,6 @@ async def startup_db_client():
     print(MONGO_URL)
     app.mongodb_client = AsyncIOMotorClient(MONGO_URL)
     app.mongodb = app.mongodb_client[DB_NAME]
-    print("----------------------------------------DONE------------------------------------")
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
@@ -136,7 +135,6 @@ def user_home():
 # Register route for user registration
 @app.post("/register/", status_code=status.HTTP_201_CREATED)
 async def register_new_user(user: UserRegister, res: Response):
-    print("hello")
     db = app.mongodb
     if await user_exists(user, db) == False:
         return {"message": "Username or email already taken"}
