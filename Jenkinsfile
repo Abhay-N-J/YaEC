@@ -110,7 +110,7 @@ pipeline {
 
                     if (frontendIP) {
                         echo "External IP of frontend service: ${frontendIP}"
-                        sh "ngrok http ${frontendIP}:8004 &"
+                        // sh "sudo -u jenkins ngrok http ${frontendIP}:8004 &"
                     } else {
                         echo "Error: External IP of frontend service not found"
                     }
