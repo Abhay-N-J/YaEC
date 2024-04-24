@@ -20,6 +20,7 @@ pipeline {
                 script {
                     dir('user-management') {
                         sh "docker build -t abhayjo/cc-backend-user:1.0 ."
+                        sh "ls"
                     }
                     dir('product-management') {
                         sh "docker build -t abhayjo/cc-backend-product:1.0 ."
