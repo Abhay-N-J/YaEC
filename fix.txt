@@ -1,0 +1,41 @@
+ 2052  kubectl create serviceaccount jenkins --context minikube
+ 2053  kubectl create clusterrole jenkins-role --verb=get,list,create,update,delete --resource=pods,pods/log,pods/exec
+ 2054  kubectl create clusterrolebinding jenkins-rolebinding --clusterrole=jenkins-role --serviceaccount=default:jenkins
+ 2055  kubectl describe clusterrolebinding jenkins-rolebinding
+ 2056  git add -A
+ 2057  git commit -m "fix jenkins-11"
+ 2058  git push origin main
+ 2059  git add -A
+ 2060  git commit -m "fix jenkins-12"
+ 2061  git push origin main
+ 2062  sudo chmod 644 /home/akshar/.kube/config
+ 2063  sudo -u jenkins cat /home/akshar/.kube/config
+ 2064  ls -l /home/akshar/.kube/config
+ 2065  sudo chown jenkins:jenkins /home/akshar/.kube/config
+ 2066  sudo chmod 664 /home/akshar/.kube/config
+ 2067  ls -l /home/akshar/.kube/config
+ 2068  sudo -u jenkins cat /home/akshar/.kube/config
+ 2069  ls -ld /var/lib/jenkins
+ 2070  sudo grep jenkins /var/log/syslog | grep -i apparmor
+ 2071  echo "Test" > /home/akshar/test.txt
+ 2072  sudo -u jenkins cat /home/akshar/test.txt
+ 2073  ls -ld /var/lib/jenkins
+ 2074  ls -ld /home
+ 2075  ls -ld /home/akshar
+ 2076  sudo chmod 755 /home/akshar
+ 2077  sudo -u jenkins cat /home/akshar/.kube/config
+ 2078  sudo chmod -R 755 /home/akshar/.minikube
+ 2079  sudo -u jenkins cat /home/akshar/.minikube/config
+ 2080  kubectl get services
+ 2081  kubectl get pods
+ 2082  kubectl get deployments
+ 2083  kubectl delete deployment mongodb
+ 2084  kubectl get deployments
+ 2085  kubectl get pods
+ 2086  kubectl get services
+ 2087  minikube status
+ 2088  git add -A
+ 2089  git commit -m "fix jenkins-13"
+ 2090  git push origin main
+ 2091  kubectl get services
+ 2092  history
