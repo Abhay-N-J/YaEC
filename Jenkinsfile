@@ -7,7 +7,7 @@ pipeline {
 
     stages {
         stage('Clone') {
-            steps {
+`            steps {
                 checkout([$class: 'GitSCM',
                     branches: [[name: '*/main']],
                     userRemoteConfigs: [[url: 'https://github.com/AKSHAR-0909/YaEC']]
@@ -19,19 +19,19 @@ pipeline {
             steps {
                 script {
                     dir('user-management') {
-                        sh "docker build -t akshar0909/cc-backend-user:1.0 ."
+                        sh "docker build -t abhayjo/cc-backend-user:1.0 ."
                     }
                     dir('product-management') {
-                        sh "docker build -t akshar0909/cc-backend-product:1.0 ."
+                        sh "docker build -t abhayjo/cc-backend-product:1.0 ."
                     }
                     dir('order-management') {
-                        sh "docker build -t akshar0909/cc-backend-order:1.0 ."
+                        sh "docker build -t abhayjo/cc-backend-order:1.0 ."
                     }
                     dir('review-management') {
-                        sh "docker build -t akshar0909/cc-backend-review:1.0 ."
+                        sh "docker build -t abhayjo/cc-backend-review:1.0 ."
                     }
                     dir('frontend') {
-                        sh "docker build -t akshar0909/cc-frontend:1.0 ."
+                        sh "docker build -t abhayjo/cc-frontend:1.0 ."
                     }
                 }
             }
@@ -44,35 +44,35 @@ pipeline {
                         withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
                             def registry_url = "docker.io"
                             sh "docker login -u $USER -p $PASSWORD ${registry_url}"
-                            sh "docker push akshar0909/cc-backend-user:1.0"
+                            sh "docker push abhayjo/cc-backend-user:1.0"
                         }
                     }
                     dir('product-management') {
                         withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
                             def registry_url = "docker.io"
                             sh "docker login -u $USER -p $PASSWORD ${registry_url}"
-                            sh "docker push akshar0909/cc-backend-product:1.0"
+                            sh "docker push abhayjo/cc-backend-product:1.0"
                         }
                     }
                     dir('order-management') {
                         withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
                             def registry_url = "docker.io"
                             sh "docker login -u $USER -p $PASSWORD ${registry_url}"
-                            sh "docker push akshar0909/cc-backend-order:1.0"
+                            sh "docker push abhayjo/cc-backend-order:1.0"
                         }
                     }
                     dir('review-management') {
                         withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
                             def registry_url = "docker.io"
                             sh "docker login -u $USER -p $PASSWORD ${registry_url}"
-                            sh "docker push akshar0909/cc-backend-review:1.0"
+                            sh "docker push abhayjo/cc-backend-review:1.0"
                         }
                     }
                     dir('frontend') {
                         withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
                             def registry_url = "docker.io"
                             sh "docker login -u $USER -p $PASSWORD ${registry_url}"
-                            sh "docker push akshar0909/cc-frontend:1.0"
+                            sh "docker push abhayjo/cc-frontend:1.0"
                         }
                     }
                 }
