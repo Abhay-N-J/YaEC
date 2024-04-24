@@ -394,7 +394,7 @@ def delete_order():
 def review_management():
     st.title('Review Management')
 
-    response = requests.get("http://review-service:8003/reviews/")
+    response = requests.get("http://product-service:8001/products/")
     response_json = response.json()
     
     st.subheader("Reviews:")
@@ -450,11 +450,11 @@ def review_management():
                 st.success("Review Created Successfully !!!")
 
 st.sidebar.title('Navigation')
-page = st.sidebar.selectbox('Go to', ['Profile Management','Product Management', 'Order Management', 'Review Management'])
+page = st.sidebar.selectbox('Go to', ['Product Management', 'Order Management', 'Review Management'])
 
-if page == 'Profile Management':
-    manage_profile()
-elif page == 'Product Management':
+# if page == 'Profile Management':
+#     manage_profile()
+if page == 'Product Management':
     product_management()
 elif page == 'Order Management':
     order_management()
