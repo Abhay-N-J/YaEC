@@ -46,8 +46,10 @@ class UserProfileUpdate(BaseModel):
 
 @app.on_event("startup")
 async def startup_db_client():
+    print(MONGO_URL)
     app.mongodb_client = AsyncIOMotorClient(MONGO_URL)
     app.mongodb = app.mongodb_client[DB_NAME]
+    print("----------------------------------------DONE------------------------------------")
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
