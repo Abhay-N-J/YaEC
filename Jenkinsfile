@@ -43,35 +43,35 @@ pipeline {
                     dir('user-management') {
                         withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
                             def registry_url = "docker.io"
-                            sh "docker login -u $USER -p $PASSWORD ${registry_url}"
+                            sh "echo '${PASSWORD}' | docker login --username '${USER}' --password-stdin"
                             sh "docker push abhayjo/cc-backend-user:1.0"
                         }
                     }
                     dir('product-management') {
                         withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
                             def registry_url = "docker.io"
-                            sh "docker login -u $USER -p $PASSWORD ${registry_url}"
+                            sh "echo '${PASSWORD}' | docker login --username '${USER}' --password-stdin"
                             sh "docker push abhayjo/cc-backend-product:1.0"
                         }
                     }
                     dir('order-management') {
                         withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
                             def registry_url = "docker.io"
-                            sh "docker login -u $USER -p $PASSWORD ${registry_url}"
+                            sh "echo '${PASSWORD}' | docker login --username '${USER}' --password-stdin"
                             sh "docker push abhayjo/cc-backend-order:1.0"
                         }
                     }
                     dir('review-management') {
                         withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
                             def registry_url = "docker.io"
-                            sh "docker login -u $USER -p $PASSWORD ${registry_url}"
+                            sh "echo '${PASSWORD}' | docker login --username '${USER}' --password-stdin"
                             sh "docker push abhayjo/cc-backend-review:1.0"
                         }
                     }
                     dir('frontend') {
                         withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
                             def registry_url = "docker.io"
-                            sh "docker login -u $USER -p $PASSWORD ${registry_url}"
+                            sh "echo '${PASSWORD}' | docker login --username '${USER}' --password-stdin"
                             sh "docker push abhayjo/cc-frontend:1.0"
                         }
                     }
