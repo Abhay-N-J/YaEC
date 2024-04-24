@@ -106,7 +106,7 @@ pipeline {
                     sh "sudo -u jenkins minikube tunnel &"
                     sleep 10
 
-                    def frontendIP = sh(script: "sudo -u jenkins kubectl get svc frontend -o jsonpath='{.status.loadBalancer.ingress[0].ip}'", returnStdout: true).trim()
+                    def frontendIP = sh(script: "sudo -u jenkins kubectl get svc frontend-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}'", returnStdout: true).trim()
 
                     if (frontendIP) {
                         echo "External IP of frontend service: ${frontendIP}"
