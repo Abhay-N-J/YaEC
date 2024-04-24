@@ -19,24 +19,24 @@ pipeline {
             steps {
                 script {
                     dir('user-management') {
-                        sh "docker build -t cc-backend-user:1.0 ."
-                        sh "docker tag cc-backend-user:1.0 abhayjo/cc-backend-user:1.0"
+                        sh "docker build -t cc-backend-user:latest ."
+                        sh "docker tag cc-backend-user:latest abhayjo/cc-backend-user:latest"
                     }
                     dir('product-management') {
-                        sh "docker build -t cc-backend-product:1.0 ."
-                        sh "docker tag cc-backend-product:1.0 abhayjo/cc-backend-product:1.0"
+                        sh "docker build -t cc-backend-product:latest ."
+                        sh "docker tag cc-backend-product:latest abhayjo/cc-backend-product:latest"
                     }
                     dir('order-management') {
-                        sh "docker build -t cc-backend-order:1.0 ."
-                        sh "docker tag cc-backend-order:1.0 abhayjo/cc-backend-order:1.0"
+                        sh "docker build -t cc-backend-order:latest ."
+                        sh "docker tag cc-backend-order:latest abhayjo/cc-backend-order:latest"
                     }
                     dir('review-management') {
-                        sh "docker build -t cc-backend-review:1.0 ."
-                        sh "docker tag cc-backend-review:1.0 abhayjo/cc-backend-review:1.0"
+                        sh "docker build -t cc-backend-review:latest ."
+                        sh "docker tag cc-backend-review:latest abhayjo/cc-backend-review:latest"
                     }
                     dir('frontend') {
-                        sh "docker build -t cc-frontend:1.0 ."
-                        sh "docker tag cc-frontend:1.0 abhayjo/cc-frontend:1.0"
+                        sh "docker build -t cc-frontend:latest ."
+                        sh "docker tag cc-frontend:latest abhayjo/cc-frontend:latest"
                     }
                 }
             }
@@ -49,35 +49,35 @@ pipeline {
                         withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
                             def registry_url = "docker.io"
                             sh "echo '${PASSWORD}' | docker login --username '${USER}' --password-stdin"
-                            sh "docker push abhayjo/cc-backend-user:1.0"
+                            sh "docker push abhayjo/cc-backend-user:latest"
                         }
                     }
                     dir('product-management') {
                         withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
                             def registry_url = "docker.io"
                             sh "echo '${PASSWORD}' | docker login --username '${USER}' --password-stdin"
-                            sh "docker push abhayjo/cc-backend-product:1.0"
+                            sh "docker push abhayjo/cc-backend-product:latest"
                         }
                     }
                     dir('order-management') {
                         withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
                             def registry_url = "docker.io"
                             sh "echo '${PASSWORD}' | docker login --username '${USER}' --password-stdin"
-                            sh "docker push abhayjo/cc-backend-order:1.0"
+                            sh "docker push abhayjo/cc-backend-order:latest"
                         }
                     }
                     dir('review-management') {
                         withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
                             def registry_url = "docker.io"
                             sh "echo '${PASSWORD}' | docker login --username '${USER}' --password-stdin"
-                            sh "docker push abhayjo/cc-backend-review:1.0"
+                            sh "docker push abhayjo/cc-backend-review:latest"
                         }
                     }
                     dir('frontend') {
                         withCredentials([usernamePassword(credentialsId: 'docker-registry-credentials', usernameVariable: 'USER', passwordVariable: 'PASSWORD')]) {
                             def registry_url = "docker.io"
                             sh "echo '${PASSWORD}' | docker login --username '${USER}' --password-stdin"
-                            sh "docker push abhayjo/cc-frontend:1.0"
+                            sh "docker push abhayjo/cc-frontend:latest"
                         }
                     }
                 }

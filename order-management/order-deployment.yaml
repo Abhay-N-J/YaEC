@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: order-deployment
-        image: abhayjo/cc-backend-order:1.0
+        image: abhayjo/cc-backend-order:latest
         ports:
         - containerPort: 8002
         imagePullPolicy: Always
