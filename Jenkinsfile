@@ -7,7 +7,7 @@ pipeline {
 
     stages {
         stage('Clone') {
-`            steps {
+            steps {
                 checkout([$class: 'GitSCM',
                     branches: [[name: '*/main']],
                     userRemoteConfigs: [[url: 'https://github.com/AKSHAR-0909/YaEC']]
