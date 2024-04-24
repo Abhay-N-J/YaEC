@@ -19,20 +19,19 @@ pipeline {
             steps {
                 script {
                     dir('user-management') {
-                        sh "docker build -t abhayjo/cc-backend-user:1.0 ."
-                        sh "ls"
+                        sh "docker build -t cc-backend-user:1.0 ."
                     }
                     dir('product-management') {
-                        sh "docker build -t abhayjo/cc-backend-product:1.0 ."
+                        sh "docker build -t cc-backend-product:1.0 ."
                     }
                     dir('order-management') {
-                        sh "docker build -t abhayjo/cc-backend-order:1.0 ."
+                        sh "docker build -t cc-backend-order:1.0 ."
                     }
                     dir('review-management') {
-                        sh "docker build -t abhayjo/cc-backend-review:1.0 ."
+                        sh "docker build -t cc-backend-review:1.0 ."
                     }
                     dir('frontend') {
-                        sh "docker build -t abhayjo/cc-frontend:1.0 ."
+                        sh "docker build -t cc-frontend:1.0 ."
                     }
                 }
             }
@@ -111,7 +110,7 @@ pipeline {
 
                     if (frontendIP) {
                         echo "External IP of frontend service: ${frontendIP}"
-                        sh "ngrok http ${frontendIP}:8004"
+                        sh "ngrok http ${frontendIP}:8004 &"
                     } else {
                         echo "Error: External IP of frontend service not found"
                     }
