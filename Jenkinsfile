@@ -9,8 +9,8 @@ pipeline {
         stage('Clone') {
             steps {
                 checkout([$class: 'GitSCM',
-                    branches: [[name: '*/main']],
-                    userRemoteConfigs: [[url: 'https://github.com/AKSHAR-0909/YaEC']]
+                    branches: [[name: '*/joshi']],
+                    userRemoteConfigs: [[url: 'https://github.com/Abhay-N-J/YaEC']]
                 ])
             }
         }
@@ -36,7 +36,7 @@ pipeline {
                     }
                     dir('frontend') {
                         sh "docker build -t cc-frontend:1.0 ."
-                        sh "docker tag cc-backend-frontend:1.0 abhayjo/cc-backend-frontend:1.0"
+                        sh "docker tag cc-frontend:1.0 abhayjo/cc-frontend:1.0"
                     }
                 }
             }
