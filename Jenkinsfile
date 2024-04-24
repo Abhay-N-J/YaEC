@@ -107,10 +107,10 @@ pipeline {
                     sleep 10
 
                     def frontendIP = sh(script: "sudo -u jenkins kubectl get svc frontend-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}'", returnStdout: true).trim()
-                    
+
                     if (frontendIP) {
                         echo "External IP of frontend service: ${frontendIP}"
-                        sh "ngrok http ${frontendIP}:80 &"
+                        sh "ngrok http ${frontendIP}:8004 &"
                     } else {
                         echo "Error: External IP of frontend service not found"
                     }
