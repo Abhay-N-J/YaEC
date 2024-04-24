@@ -100,8 +100,33 @@ pipeline {
                 }
             }
         }
+        stage('Expose Service') {
+            steps {
+                script {
+                    // Start Minikube tunnel
+                    sh "sudo -u jenkins minikube tunnel &"
+
+                    // Wait for Minikube tunnel to start
+                    sleep 10
+
+                    // Get external IP of frontend service
+                    def frontendIP = sh(script: "sudo -u jenkins kubectl get svc frontend -o jsonpath='{.status.loadBalancer.ingress[0].ip}'", returnStdout: true).trim()
+
+                    // Check if external IP is obtained
+                    if (frontendIP) {
+                        echo "External IP of frontend service: ${frontendIP}"
+
+                        // Run Ngrok on the external IP and port 80 (adjust port as needed)
+                        sh "ngrok http ${frontendIP}:80 &"
+                    } else {
+                        echo "Error: External IP of frontend service not found"
+                    }
+                }
+            }
+        }
 
     }
+    
 
     post {
         failure {
