@@ -158,7 +158,7 @@ def product_user_view():
     response_json = response.json()
     
     if "selected_product" in st.session_state:
-        product_details_view()
+        product_details_view(st.session_state.selected_product)
     
     elif "error" not in response_json:
         # Create a DataFrame from the products
@@ -311,7 +311,8 @@ def order_history():
     st.subheader('## Orders')
     response = requests.get("http://order-service:8002/orders/",
                             auth=(st.session_state.user, st.session_state.token))
-    st.success(response_json)
+    # st.success(response_json)
+    response_json = response.json()
     if "error" not in response_json:
         orders_df = pd.DataFrame(response_json)
         st.dataframe(orders_df)
