@@ -433,9 +433,10 @@ def review_management():
                 "rating": new_rating,
                 "comment": new_comment
             }
-            response = requests.put("http://review-service:8003/reviews/{user_name}/{product_name}/",
+            response = requests.put("http://review-service:8003/reviews/{data['user_name']}/{data['product_name']}/",
                                      headers={"Content-Type": "application/json"},
                                      json=data) 
+            response_json = response.json()
             if "error" in response_json:
                 st.error(f'Failed to Update Review. Error: {response_json["error"]}')
             else:
