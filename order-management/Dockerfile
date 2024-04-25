@@ -10,5 +10,7 @@ COPY . .
 
 EXPOSE 8002
 
+ENV MONGO_URI=mongodb://mongodb-service:27017/YaEC
+
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8002","--reload"]
 
