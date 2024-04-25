@@ -1,0 +1,4 @@
+start 
+sudo -u jen minikube delete/start
+sudo -u jen docker images rmi
+build
